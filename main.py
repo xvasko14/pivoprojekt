@@ -77,10 +77,23 @@ async def event_detail(event_id: str, request: Request):
     event = database.get_event(event_id)
     if not event:
         raise HTTPException(status_code=404)
+    rsvps = database.get_rsvps(event_id)
+    going = [r for r in rsvps if r["going"]]
+    not_going = [r for r in rsvps if not r["going"]]
     flash = request.session.pop("flash", None)
     return templates.TemplateResponse(request, "event_detail.html", {
         "event": event,
-        "going": [],
-        "not_going": [],
+        "going": going,
+        "not_going": not_going,
         "flash": flash,
     })
+
+
+@app.exception_handler(404)
+async def not_found_handler(request: Request, exc):
+    return templates.TemplateResponse(request, "404.html", {}, status_code=404)
+
+
+@app.exception_handler(403)
+async def forbidden_handler(request: Request, exc):
+    return templates.TemplateResponse(request, "403.html", {}, status_code=403)

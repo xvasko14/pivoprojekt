@@ -34,3 +34,17 @@ def test_post_new_event_missing_place(client):
     })
     assert response.status_code == 200
     assert "Nový event" in response.text  # re-shown form
+
+
+def test_event_detail(client, sample_event):
+    event_id = sample_event["id"]
+    response = client.get(f"/events/{event_id}")
+    assert response.status_code == 200
+    assert "Hostinec U Karla" in response.text
+    assert "Idem" in response.text
+    assert "Neidem" in response.text
+
+
+def test_event_detail_not_found(client):
+    response = client.get("/events/nonexistent-id")
+    assert response.status_code == 404

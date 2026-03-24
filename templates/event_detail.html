@@ -1,17 +1,45 @@
-<!-- templates/event_detail.html — stub, replaced in Task 7 -->
+<!-- templates/event_detail.html -->
 {% extends "base.html" %}
-{% block title %}Event — PivoProjekt{% endblock %}
+{% block title %}{{ event.place }} — PivoProjekt{% endblock %}
 {% block content %}
 
-{% if flash %}
-<div class="flash flash-{{ flash.type }}">{{ flash.message | safe }}</div>
-{% endif %}
+<a href="/" class="back-link">← Späť na zoznam</a>
 
-<a href="/" class="back-link">← Späť</a>
-<h1>{{ event.place }}</h1>
-<p>{{ event.event_date }} o {{ event.event_time }}</p>
-{% if event.description %}<p>{{ event.description }}</p>{% endif %}
+<div class="event-header">
+  <div class="event-title">🍺 {{ event.place }}</div>
+  <div class="event-meta">📅 {{ event.event_date }} o {{ event.event_time }}</div>
+  {% if event.description %}
+  <div class="event-desc">📝 {{ event.description }}</div>
+  {% endif %}
+</div>
 
-<p><a href="/events/{{ event.id }}/delete">delete</a></p>
+<div class="rsvp-summary">
+  <div class="rsvp-box rsvp-box-going">
+    <div class="rsvp-count">{{ going | length }}</div>
+    <div class="rsvp-label">idú ✅</div>
+    <div class="rsvp-names">{{ going | map(attribute='name') | join(', ') }}</div>
+  </div>
+  <div class="rsvp-box rsvp-box-not">
+    <div class="rsvp-count">{{ not_going | length }}</div>
+    <div class="rsvp-label">nejdú ❌</div>
+    <div class="rsvp-names">{{ not_going | map(attribute='name') | join(', ') }}</div>
+  </div>
+</div>
+
+<div class="rsvp-form">
+  <h3>Hlásiš sa?</h3>
+  <form method="post" action="/events/{{ event.id }}/rsvp">
+    <div class="form-group">
+      <input type="text" name="name" placeholder="Tvoje meno" required>
+      {% if rsvp_error %}<div class="form-error">{{ rsvp_error }}</div>{% endif %}
+    </div>
+    <div class="rsvp-buttons">
+      <button type="submit" name="going" value="true" class="btn btn-success">✅ Idem!</button>
+      <button type="submit" name="going" value="false" class="btn btn-danger">❌ Neidem</button>
+    </div>
+  </form>
+</div>
+
+<p class="organizer-hint">Si organizátor? Použi tajný link na zmazanie eventu.</p>
 
 {% endblock %}
