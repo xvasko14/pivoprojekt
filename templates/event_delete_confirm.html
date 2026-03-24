@@ -1,0 +1,18 @@
+<!-- templates/event_delete_confirm.html -->
+{% extends "base.html" %}
+{% block title %}Zmazať event — PivoProjekt{% endblock %}
+{% block content %}
+
+<div class="danger-box">
+  <h2>Naozaj chceš zmazať tento event?</h2>
+  <p>🍺 <strong>{{ event.place }}</strong> — {{ event.event_date }} o {{ event.event_time }}<br>
+  Táto akcia je nevratná. Zmažú sa aj všetky RSVP odpovede.</p>
+  <div class="danger-actions">
+    <a href="/events/{{ event.id }}" class="btn btn-secondary">Zrušiť</a>
+    <form method="post" action="/events/{{ event.id }}/delete?token={{ token }}">
+      <button type="submit" class="btn btn-danger">Áno, zmazať</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

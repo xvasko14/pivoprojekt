@@ -72,6 +72,27 @@ async def create_event(
     return RedirectResponse(url=f"/events/{result['id']}", status_code=303)
 
 
+@app.get("/events/{event_id}/delete", response_class=HTMLResponse, name="delete_event_confirm")
+async def delete_event_confirm(event_id: str, request: Request, token: str = ""):
+    event = database.get_event(event_id)
+    if not event or event["delete_token"] != token:
+        raise HTTPException(status_code=403)
+    return templates.TemplateResponse(request, "event_delete_confirm.html", {
+        "event": event,
+        "token": token,
+        "flash": None,
+    })
+
+
+@app.post("/events/{event_id}/delete")
+async def delete_event(event_id: str, request: Request, token: str = ""):
+    ok = database.delete_event(event_id, token)
+    if not ok:
+        raise HTTPException(status_code=403)
+    request.session["flash"] = {"type": "success", "message": "Event bol zmazaný."}
+    return RedirectResponse(url="/", status_code=303)
+
+
 @app.post("/events/{event_id}/rsvp")
 async def submit_rsvp(
     event_id: str,

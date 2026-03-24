@@ -1,3 +1,6 @@
+import database
+
+
 def test_get_new_event_form(client):
     response = client.get("/events/new")
     assert response.status_code == 200
@@ -48,3 +51,39 @@ def test_event_detail(client, sample_event):
 def test_event_detail_not_found(client):
     response = client.get("/events/nonexistent-id")
     assert response.status_code == 404
+
+
+def test_get_delete_confirm_valid_token(client, sample_event):
+    event_id = sample_event["id"]
+    token = sample_event["delete_token"]
+    response = client.get(f"/events/{event_id}/delete?token={token}")
+    assert response.status_code == 200
+    assert "zmazať" in response.text.lower()
+
+
+def test_get_delete_wrong_token(client, sample_event):
+    event_id = sample_event["id"]
+    response = client.get(f"/events/{event_id}/delete?token=wrong")
+    assert response.status_code == 403
+
+
+def test_post_delete_valid_token(client, sample_event):
+    event_id = sample_event["id"]
+    token = sample_event["delete_token"]
+    response = client.post(f"/events/{event_id}/delete?token={token}",
+        follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/"
+
+
+def test_post_delete_removes_event(client, sample_event):
+    event_id = sample_event["id"]
+    token = sample_event["delete_token"]
+    client.post(f"/events/{event_id}/delete?token={token}", follow_redirects=True)
+    assert database.get_event(event_id) is None
+
+
+def test_post_delete_wrong_token(client, sample_event):
+    event_id = sample_event["id"]
+    response = client.post(f"/events/{event_id}/delete?token=wrong")
+    assert response.status_code == 403
