@@ -21,11 +21,9 @@ def test_post_new_event_shows_delete_link(client):
         "event_date": "2099-12-31",
         "event_time": "19:00",
         "description": "",
-    }, follow_redirects=False)
-    assert response.status_code == 303
-    location = response.headers["location"]
-    assert location.startswith("/events/")
-    # Flash with delete link is set in session — verified in Task 7 tests
+    }, follow_redirects=True)
+    assert response.status_code == 200
+    assert "delete" in response.text.lower()
 
 
 def test_post_new_event_missing_place(client):
