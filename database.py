@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import uuid
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 
 
 def get_connection():
@@ -40,7 +40,7 @@ def create_tables():
 def create_event(place: str, event_date: str, event_time: str, description: str | None) -> dict:
     event_id = str(uuid.uuid4())
     delete_token = str(uuid.uuid4())
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     with get_connection() as conn:
         conn.execute(
             "INSERT INTO events (id, place, event_date, event_time, description, delete_token, created_at) "
@@ -79,7 +79,7 @@ def get_rsvps(event_id: str) -> list[dict]:
 
 
 def upsert_rsvp(event_id: str, name: str, going: bool) -> None:
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     with get_connection() as conn:
         conn.execute(
             "INSERT INTO rsvps (event_id, name, going, created_at) VALUES (?, ?, ?, ?) "
@@ -90,10 +90,9 @@ def upsert_rsvp(event_id: str, name: str, going: bool) -> None:
 
 def delete_event(event_id: str, token: str) -> bool:
     """Returns True if deleted, False if token mismatch or event not found."""
-    event = get_event(event_id)
-    if not event or event["delete_token"] != token:
-        return False
     with get_connection() as conn:
-        conn.execute("DELETE FROM rsvps WHERE event_id = ?", (event_id,))
-        conn.execute("DELETE FROM events WHERE id = ?", (event_id,))
-    return True
+        result = conn.execute(
+            "DELETE FROM events WHERE id = ? AND delete_token = ?",
+            (event_id, token),
+        )
+    return result.rowcount == 1
