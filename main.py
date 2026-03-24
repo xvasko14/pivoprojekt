@@ -90,10 +90,10 @@ async def event_detail(event_id: str, request: Request):
 
 
 @app.exception_handler(404)
-async def not_found_handler(request: Request, exc):
+async def not_found_handler(request: Request, exc: HTTPException):
     return templates.TemplateResponse(request, "404.html", {}, status_code=404)
 
 
 @app.exception_handler(403)
-async def forbidden_handler(request: Request, exc):
+async def forbidden_handler(request: Request, exc: HTTPException):
     return templates.TemplateResponse(request, "403.html", {}, status_code=403)
