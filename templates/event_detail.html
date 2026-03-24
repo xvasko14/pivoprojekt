@@ -1,0 +1,17 @@
+<!-- templates/event_detail.html — stub, replaced in Task 7 -->
+{% extends "base.html" %}
+{% block title %}Event — PivoProjekt{% endblock %}
+{% block content %}
+
+{% if flash %}
+<div class="flash flash-{{ flash.type }}">{{ flash.message | safe }}</div>
+{% endif %}
+
+<a href="/" class="back-link">← Späť</a>
+<h1>{{ event.place }}</h1>
+<p>{{ event.event_date }} o {{ event.event_time }}</p>
+{% if event.description %}<p>{{ event.description }}</p>{% endif %}
+
+<p><a href="{{ event.id }}/delete">delete</a></p>
+
+{% endblock %}

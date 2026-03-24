@@ -1,0 +1,39 @@
+<!-- templates/event_new.html -->
+{% extends "base.html" %}
+{% block title %}Nový event — PivoProjekt{% endblock %}
+{% block content %}
+
+<a href="/" class="back-link">← Späť</a>
+<h1 style="margin-bottom:24px">🍺 Nový event</h1>
+
+<form method="post" action="/events/new">
+  <div class="form-group">
+    <label for="place">Miesto (pub / hostinec)</label>
+    <input type="text" id="place" name="place" value="{{ place or '' }}" placeholder="napr. Hostinec U Karla" required>
+    {% if errors.place %}<div class="form-error">{{ errors.place }}</div>{% endif %}
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="event_date">Dátum</label>
+      <input type="date" id="event_date" name="event_date" value="{{ event_date or '' }}" required>
+      {% if errors.event_date %}<div class="form-error">{{ errors.event_date }}</div>{% endif %}
+    </div>
+    <div class="form-group">
+      <label for="event_time">Čas</label>
+      <input type="time" id="event_time" name="event_time" value="{{ event_time or '' }}" required>
+      {% if errors.event_time %}<div class="form-error">{{ errors.event_time }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="description">Popis (voliteľné)</label>
+    <input type="text" id="description" name="description" value="{{ description or '' }}" placeholder="napr. Oslavujeme Janovu novú robotu 😄">
+  </div>
+
+  <button type="submit" class="btn btn-primary" style="width:100%;padding:12px;font-size:1rem">
+    Vytvoriť event →
+  </button>
+</form>
+
+{% endblock %}

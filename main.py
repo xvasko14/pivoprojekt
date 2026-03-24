@@ -1,6 +1,6 @@
 # main.py
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Form, Request
+from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -28,5 +28,59 @@ async def home(request: Request):
     return templates.TemplateResponse(request, "home.html", {
         "upcoming": upcoming,
         "past": past,
+        "flash": flash,
+    })
+
+
+@app.get("/events/new", response_class=HTMLResponse)
+async def new_event_form(request: Request):
+    return templates.TemplateResponse(request, "event_new.html", {"errors": {}})
+
+
+@app.post("/events/new")
+async def create_event(
+    request: Request,
+    place: str = Form(""),
+    event_date: str = Form(""),
+    event_time: str = Form(""),
+    description: str = Form(""),
+):
+    errors = {}
+    if not place.strip():
+        errors["place"] = "Zadaj miesto"
+    if not event_date.strip():
+        errors["event_date"] = "Zadaj dátum"
+    if not event_time.strip():
+        errors["event_time"] = "Zadaj čas"
+
+    if errors:
+        return templates.TemplateResponse(request, "event_new.html", {
+            "errors": errors,
+            "place": place,
+            "event_date": event_date,
+            "event_time": event_time,
+            "description": description,
+        })
+
+    result = database.create_event(place.strip(), event_date.strip(), event_time.strip(), description.strip() or None)
+    delete_url = f"/events/{result['id']}/delete?token={result['delete_token']}"
+    request.session["flash"] = {
+        "type": "warning",
+        "message": f"⚠️ Ulož si tajný link na zmazanie eventu (zobrazí sa len raz):<br>"
+                   f"<code>{delete_url}</code>"
+    }
+    return RedirectResponse(url=f"/events/{result['id']}", status_code=303)
+
+
+@app.get("/events/{event_id}", response_class=HTMLResponse, name="event_detail")
+async def event_detail(event_id: str, request: Request):
+    event = database.get_event(event_id)
+    if not event:
+        raise HTTPException(status_code=404)
+    flash = request.session.pop("flash", None)
+    return templates.TemplateResponse(request, "event_detail.html", {
+        "event": event,
+        "going": [],
+        "not_going": [],
         "flash": flash,
     })
