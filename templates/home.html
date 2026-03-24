@@ -1,0 +1,35 @@
+<!-- templates/home.html -->
+{% extends "base.html" %}
+{% block title %}PivoProjekt — Pivo s kamošmi{% endblock %}
+{% block content %}
+
+{% if upcoming %}
+<p class="section-title">Nadchádzajúce</p>
+<div class="cards">
+  {% for event in upcoming %}
+  <a href="/events/{{ event.id }}" class="card">
+    <div class="card-place">🍺 {{ event.place }}</div>
+    <div class="card-datetime">
+      📅 {{ event.event_date }} o {{ event.event_time }}
+    </div>
+    <div class="card-going">✅ {{ event.going_count }} idú</div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p style="color:#aaa;margin-bottom:40px">Žiadne nadchádzajúce eventy. <a href="/events/new">Vytvor prvý!</a></p>
+{% endif %}
+
+{% if past %}
+<p class="section-title">História</p>
+<div class="history-list">
+  {% for event in past %}
+  <a href="/events/{{ event.id }}" class="history-item">
+    <span>{{ event.place }}</span>
+    <span>{{ event.event_date }} · ✅ {{ event.going_count }} išlo</span>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

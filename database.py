@@ -61,7 +61,13 @@ def get_all_events() -> tuple[list[dict], list[dict]]:
     today = date.today().isoformat()
     with get_connection() as conn:
         rows = conn.execute(
-            "SELECT * FROM events ORDER BY event_date ASC, event_time ASC"
+            """
+            SELECT e.*, COUNT(CASE WHEN r.going = 1 THEN 1 END) as going_count
+            FROM events e
+            LEFT JOIN rsvps r ON r.event_id = e.id
+            GROUP BY e.id
+            ORDER BY e.event_date ASC, e.event_time ASC
+            """
         ).fetchall()
     all_events = [dict(r) for r in rows]
     upcoming = [e for e in all_events if e["event_date"] >= today]
