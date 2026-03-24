@@ -1,4 +1,7 @@
 # tests/test_rsvp.py
+import database
+
+
 def test_rsvp_going(client, sample_event):
     event_id = sample_event["id"]
     response = client.post(f"/events/{event_id}/rsvp",
@@ -19,7 +22,6 @@ def test_rsvp_overwrites(client, sample_event):
     event_id = sample_event["id"]
     client.post(f"/events/{event_id}/rsvp", data={"name": "Marek", "going": "true"})
     client.post(f"/events/{event_id}/rsvp", data={"name": "Marek", "going": "false"})
-    import database
     rsvps = database.get_rsvps(event_id)
     assert len(rsvps) == 1
     assert rsvps[0]["going"] == 0

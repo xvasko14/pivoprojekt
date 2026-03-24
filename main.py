@@ -87,12 +87,13 @@ async def submit_rsvp(
         rsvps = database.get_rsvps(event_id)
         going_list = [r for r in rsvps if r["going"]]
         not_going_list = [r for r in rsvps if not r["going"]]
+        flash = request.session.pop("flash", None)
         return templates.TemplateResponse(request, "event_detail.html", {
             "event": event,
             "going": going_list,
             "not_going": not_going_list,
             "rsvp_error": "Zadaj svoje meno",
-            "flash": None,
+            "flash": flash,
         })
 
     database.upsert_rsvp(event_id, name.strip(), going == "true")
