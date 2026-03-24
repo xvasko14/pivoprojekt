@@ -72,6 +72,33 @@ async def create_event(
     return RedirectResponse(url=f"/events/{result['id']}", status_code=303)
 
 
+@app.post("/events/{event_id}/rsvp")
+async def submit_rsvp(
+    event_id: str,
+    request: Request,
+    name: str = Form(""),
+    going: str = Form("true"),
+):
+    event = database.get_event(event_id)
+    if not event:
+        raise HTTPException(status_code=404)
+
+    if not name.strip():
+        rsvps = database.get_rsvps(event_id)
+        going_list = [r for r in rsvps if r["going"]]
+        not_going_list = [r for r in rsvps if not r["going"]]
+        return templates.TemplateResponse(request, "event_detail.html", {
+            "event": event,
+            "going": going_list,
+            "not_going": not_going_list,
+            "rsvp_error": "Zadaj svoje meno",
+            "flash": None,
+        })
+
+    database.upsert_rsvp(event_id, name.strip(), going == "true")
+    return RedirectResponse(url=f"/events/{event_id}", status_code=303)
+
+
 @app.get("/events/{event_id}", response_class=HTMLResponse, name="event_detail")
 async def event_detail(event_id: str, request: Request):
     event = database.get_event(event_id)
