@@ -97,6 +97,12 @@ A simple web app for organizing beer outings with friends. Replaces ad-hoc Faceb
 - POST → deletes event + all RSVPs, redirects to home with a flash "Event bol zmazaný."
 - If token is wrong or missing → 403 error page
 
+## Implementation Notes
+
+- **Flash message for delete link:** After event creation, the delete token is shown via a server-side session flash (Starlette `SessionMiddleware`). It appears once on the event detail page, then is cleared.
+- **RSVP duplicates:** Same name can RSVP multiple times — the last submission overwrites the previous one for that name+event combination (upsert by `event_id` + `name`).
+- **SQLite path:** For local dev, `pivo.db` in the project root. For production (Fly.io/Railway), path should point to a mounted volume (e.g., `/data/pivo.db`) — configured via `DATABASE_URL` env var.
+
 ## Error Handling
 
 - Invalid event ID → 404 page
