@@ -7,20 +7,22 @@ from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
 import os
+from datetime import date as date_type
 import database
+
+
+_DAYS = ["Pondelok", "Utorok", "Streda", "Štvrtok", "Piatok", "Sobota", "Nedeľa"]
+_MONTHS = [
+    "", "januára", "februára", "marca", "apríla", "mája", "júna",
+    "júla", "augusta", "septembra", "októbra", "novembra", "decembra"
+]
 
 
 def format_date(value: str) -> str:
     """Convert ISO date string to Slovak human-readable format."""
-    from datetime import date as date_type
-    DAYS = ["Pondelok", "Utorok", "Streda", "Štvrtok", "Piatok", "Sobota", "Nedeľa"]
-    MONTHS = [
-        "", "januára", "februára", "marca", "apríla", "mája", "júna",
-        "júla", "augusta", "septembra", "októbra", "novembra", "decembra"
-    ]
     try:
         d = date_type.fromisoformat(value)
-        return f"{DAYS[d.weekday()]} {d.day}. {MONTHS[d.month]}"
+        return f"{_DAYS[d.weekday()]} {d.day}. {_MONTHS[d.month]}"
     except (ValueError, TypeError):
         return value
 
