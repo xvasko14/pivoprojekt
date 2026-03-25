@@ -102,3 +102,10 @@ def delete_event(event_id: str, token: str) -> bool:
             (event_id, token),
         )
     return result.rowcount == 1
+
+
+def delete_event_by_id(event_id: str) -> bool:
+    """Delete event by ID only, no token check. Returns True if deleted."""
+    with get_connection() as conn:
+        result = conn.execute("DELETE FROM events WHERE id = ?", (event_id,))
+    return result.rowcount == 1

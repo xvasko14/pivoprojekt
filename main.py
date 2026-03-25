@@ -82,32 +82,26 @@ async def create_event(
         })
 
     result = database.create_event(place.strip(), event_date.strip(), event_time.strip(), description.strip() or None)
-    delete_url = f"/events/{result['id']}/delete?token={result['delete_token']}"
-    request.session["flash"] = {
-        "type": "warning",
-        "message": f"⚠️ Ulož si tajný link na zmazanie eventu (zobrazí sa len raz):<br>"
-                   f"<code>{delete_url}</code>"
-    }
+    request.session["flash"] = {"type": "success", "message": "✅ Event vytvorený!"}
     return RedirectResponse(url=f"/events/{result['id']}", status_code=303)
 
 
 @app.get("/events/{event_id}/delete", response_class=HTMLResponse, name="delete_event_confirm")
-async def delete_event_confirm(event_id: str, request: Request, token: str = ""):
+async def delete_event_confirm(event_id: str, request: Request):
     event = database.get_event(event_id)
-    if not event or event["delete_token"] != token:
-        raise HTTPException(status_code=403)
+    if not event:
+        raise HTTPException(status_code=404)
     return templates.TemplateResponse(request, "event_delete_confirm.html", {
         "event": event,
-        "token": token,
         "flash": None,
     })
 
 
 @app.post("/events/{event_id}/delete")
-async def delete_event(event_id: str, request: Request, token: str = ""):
-    ok = database.delete_event(event_id, token)
+async def delete_event(event_id: str, request: Request):
+    ok = database.delete_event_by_id(event_id)
     if not ok:
-        raise HTTPException(status_code=403)
+        raise HTTPException(status_code=404)
     request.session["flash"] = {"type": "success", "message": "Event bol zmazaný."}
     return RedirectResponse(url="/", status_code=303)
 

@@ -18,7 +18,7 @@ def test_post_new_event_redirects_to_detail(client):
     assert response.headers["location"].startswith("/events/")
 
 
-def test_post_new_event_shows_delete_link(client):
+def test_post_new_event_creates_event(client):
     response = client.post("/events/new", data={
         "place": "U Karla",
         "event_date": "2099-12-31",
@@ -26,7 +26,7 @@ def test_post_new_event_shows_delete_link(client):
         "description": "",
     }, follow_redirects=True)
     assert response.status_code == 200
-    assert "delete" in response.text.lower()
+    assert "U Karla" in response.text
 
 
 def test_post_new_event_missing_place(client):
@@ -53,37 +53,32 @@ def test_event_detail_not_found(client):
     assert response.status_code == 404
 
 
-def test_get_delete_confirm_valid_token(client, sample_event):
+def test_get_delete_confirm(client, sample_event):
+    """Anyone can access the delete confirmation page."""
     event_id = sample_event["id"]
-    token = sample_event["delete_token"]
-    response = client.get(f"/events/{event_id}/delete?token={token}")
+    response = client.get(f"/events/{event_id}/delete")
     assert response.status_code == 200
     assert "zmazať" in response.text.lower()
 
 
-def test_get_delete_wrong_token(client, sample_event):
-    event_id = sample_event["id"]
-    response = client.get(f"/events/{event_id}/delete?token=wrong")
-    assert response.status_code == 403
+def test_get_delete_confirm_nonexistent(client):
+    response = client.get("/events/nonexistent-id/delete")
+    assert response.status_code == 404
 
 
-def test_post_delete_valid_token(client, sample_event):
+def test_post_delete_redirects_home(client, sample_event):
     event_id = sample_event["id"]
-    token = sample_event["delete_token"]
-    response = client.post(f"/events/{event_id}/delete?token={token}",
-        follow_redirects=False)
+    response = client.post(f"/events/{event_id}/delete", follow_redirects=False)
     assert response.status_code == 303
     assert response.headers["location"] == "/"
 
 
 def test_post_delete_removes_event(client, sample_event):
     event_id = sample_event["id"]
-    token = sample_event["delete_token"]
-    client.post(f"/events/{event_id}/delete?token={token}", follow_redirects=True)
+    client.post(f"/events/{event_id}/delete", follow_redirects=True)
     assert database.get_event(event_id) is None
 
 
-def test_post_delete_wrong_token(client, sample_event):
-    event_id = sample_event["id"]
-    response = client.post(f"/events/{event_id}/delete?token=wrong")
-    assert response.status_code == 403
+def test_post_delete_nonexistent(client):
+    response = client.post("/events/nonexistent-id/delete")
+    assert response.status_code == 404

@@ -9,7 +9,7 @@
   Táto akcia je nevratná. Zmažú sa aj všetky RSVP odpovede.</p>
   <div class="danger-actions">
     <a href="/events/{{ event.id }}" class="btn btn-secondary">Zrušiť</a>
-    <form method="post" action="/events/{{ event.id }}/delete?token={{ token | urlencode }}">
+    <form method="post" action="/events/{{ event.id }}/delete">
       <button type="submit" class="btn btn-danger">Áno, zmazať</button>
     </form>
   </div>
