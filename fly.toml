@@ -1,0 +1,18 @@
+app = "pivoproject"
+primary_region = "fra"
+
+[build]
+
+[env]
+  DATABASE_PATH = "/data/pivo.db"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[mounts]]
+  source = "pivo_data"
+  destination = "/data"
