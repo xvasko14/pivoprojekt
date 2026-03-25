@@ -53,3 +53,22 @@ def test_get_all_events_split():
     upcoming, past = database.get_all_events()
     assert any(e["place"] == "Future Pub" for e in upcoming)
     assert any(e["place"] == "Past Pub" for e in past)
+
+
+def test_get_all_events_going_names():
+    database.create_event("Pub A", "2099-01-01", "18:00", None)
+    result = database.create_event("Pub B", "2099-02-01", "19:00", None)
+    event_id = result["id"]
+    database.upsert_rsvp(event_id, "Jano", True)
+    database.upsert_rsvp(event_id, "Ferko", True)
+    database.upsert_rsvp(event_id, "Miro", False)
+    upcoming, _ = database.get_all_events()
+    pub_b = next(e for e in upcoming if e["place"] == "Pub B")
+    assert pub_b["going_names"] == ["Jano", "Ferko"]
+
+
+def test_get_all_events_going_names_empty():
+    database.create_event("Pub C", "2099-03-01", "20:00", None)
+    upcoming, _ = database.get_all_events()
+    pub_c = next(e for e in upcoming if e["place"] == "Pub C")
+    assert pub_c["going_names"] == []

@@ -12,7 +12,18 @@
     <div class="card-datetime">
       📅 {{ event.event_date | format_date }} o {{ event.event_time }}
     </div>
-    <div class="card-going">✅ {{ event.going_count }} idú</div>
+    {% if event.going_names %}
+    <div class="card-going">
+      ✅
+      {% if event.going_names | length <= 3 %}
+        {{ event.going_names | join(', ') }}
+      {% else %}
+        {{ event.going_names[:3] | join(', ') }} a {{ event.going_names | length - 3 }} ďalší
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="card-going" style="color:#aaa">Nikto zatiaľ</div>
+    {% endif %}
   </a>
   {% endfor %}
 </div>

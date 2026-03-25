@@ -69,7 +69,20 @@ def get_all_events() -> tuple[list[dict], list[dict]]:
             ORDER BY e.event_date ASC, e.event_time ASC
             """
         ).fetchall()
-    all_events = [dict(r) for r in rows]
+        name_rows = conn.execute(
+            "SELECT event_id, name FROM rsvps WHERE going = 1 ORDER BY created_at ASC"
+        ).fetchall()
+
+    names_by_event: dict[str, list[str]] = {}
+    for row in name_rows:
+        names_by_event.setdefault(row["event_id"], []).append(row["name"])
+
+    all_events = []
+    for r in rows:
+        e = dict(r)
+        e["going_names"] = names_by_event.get(e["id"], [])
+        all_events.append(e)
+
     upcoming = [e for e in all_events if e["event_date"] >= today]
     past = [e for e in all_events if e["event_date"] < today]
     return upcoming, past
