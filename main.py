@@ -134,6 +134,50 @@ async def submit_rsvp(
     return RedirectResponse(url=f"/events/{event_id}", status_code=303)
 
 
+@app.get("/events/{event_id}/edit", response_class=HTMLResponse)
+async def edit_event_form(event_id: str, request: Request):
+    event = database.get_event(event_id)
+    if not event:
+        raise HTTPException(status_code=404)
+    return templates.TemplateResponse(request, "event_edit.html", {
+        "event": event,
+        "errors": {},
+    })
+
+
+@app.post("/events/{event_id}/edit")
+async def edit_event(
+    event_id: str,
+    request: Request,
+    place: str = Form(""),
+    event_date: str = Form(""),
+    event_time: str = Form(""),
+    description: str = Form(""),
+):
+    event = database.get_event(event_id)
+    if not event:
+        raise HTTPException(status_code=404)
+
+    errors = {}
+    if not place.strip():
+        errors["place"] = "Zadaj miesto"
+    if not event_date.strip():
+        errors["event_date"] = "Zadaj dátum"
+    if not event_time.strip():
+        errors["event_time"] = "Zadaj čas"
+
+    if errors:
+        return templates.TemplateResponse(request, "event_edit.html", {
+            "event": {**event, "place": place, "event_date": event_date,
+                      "event_time": event_time, "description": description},
+            "errors": errors,
+        })
+
+    database.update_event(event_id, place.strip(), event_date.strip(),
+                          event_time.strip(), description.strip() or None)
+    return RedirectResponse(url=f"/events/{event_id}", status_code=303)
+
+
 @app.get("/events/{event_id}", response_class=HTMLResponse, name="event_detail")
 async def event_detail(event_id: str, request: Request):
     event = database.get_event(event_id)

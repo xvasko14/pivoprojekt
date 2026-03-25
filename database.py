@@ -107,6 +107,16 @@ def upsert_rsvp(event_id: str, name: str, going: bool) -> None:
         )
 
 
+def update_event(event_id: str, place: str, event_date: str, event_time: str, description: str | None) -> bool:
+    """Update event fields. Returns True if found and updated."""
+    with get_connection() as conn:
+        result = conn.execute(
+            "UPDATE events SET place=?, event_date=?, event_time=?, description=? WHERE id=?",
+            (place, event_date, event_time, description, event_id),
+        )
+    return result.rowcount == 1
+
+
 def delete_event(event_id: str, token: str) -> bool:
     """Returns True if deleted, False if token mismatch or event not found."""
     with get_connection() as conn:

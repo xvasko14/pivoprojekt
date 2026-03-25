@@ -40,6 +40,9 @@
   </form>
 </div>
 
-<p class="organizer-hint">Si organizátor? Použi tajný link na zmazanie eventu.</p>
+<div class="event-actions">
+  <a href="/events/{{ event.id }}/edit" class="btn btn-secondary">✏️ Upraviť event</a>
+  <a href="/events/{{ event.id }}/delete" class="btn btn-danger">🗑️ Zmazať event</a>
+</div>
 
 {% endblock %}

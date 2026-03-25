@@ -82,3 +82,51 @@ def test_post_delete_removes_event(client, sample_event):
 def test_post_delete_nonexistent(client):
     response = client.post("/events/nonexistent-id/delete")
     assert response.status_code == 404
+
+
+def test_get_edit_form_shows_prefilled(client, sample_event):
+    event_id = sample_event["id"]
+    response = client.get(f"/events/{event_id}/edit")
+    assert response.status_code == 200
+    assert "Hostinec U Karla" in response.text
+    assert "Upraviť" in response.text
+
+
+def test_get_edit_form_not_found(client):
+    response = client.get("/events/nonexistent-id/edit")
+    assert response.status_code == 404
+
+
+def test_post_edit_updates_event(client, sample_event):
+    event_id = sample_event["id"]
+    response = client.post(f"/events/{event_id}/edit", data={
+        "place": "Nový Pub",
+        "event_date": "2099-06-15",
+        "event_time": "20:00",
+        "description": "Zmenené",
+    }, follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == f"/events/{event_id}"
+    updated = database.get_event(event_id)
+    assert updated["place"] == "Nový Pub"
+    assert updated["event_date"] == "2099-06-15"
+
+
+def test_post_edit_missing_place(client, sample_event):
+    event_id = sample_event["id"]
+    response = client.post(f"/events/{event_id}/edit", data={
+        "place": "",
+        "event_date": "2099-06-15",
+        "event_time": "20:00",
+    })
+    assert response.status_code == 200
+    assert "Upraviť" in response.text
+
+
+def test_post_edit_not_found(client):
+    response = client.post("/events/nonexistent-id/edit", data={
+        "place": "Pub",
+        "event_date": "2099-06-15",
+        "event_time": "20:00",
+    })
+    assert response.status_code == 404
