@@ -64,6 +64,7 @@ async def create_event(
     event_date: str = Form(""),
     event_time: str = Form(""),
     description: str = Form(""),
+    boys_only: str = Form(""),
 ):
     errors = {}
     if not place.strip():
@@ -81,9 +82,10 @@ async def create_event(
             "event_date": event_date,
             "event_time": event_time,
             "description": description,
+            "boys_only": boys_only,
         })
 
-    result = database.create_event(place.strip(), event_date.strip(), event_time.strip(), description.strip() or None, title.strip() or None)
+    result = database.create_event(place.strip(), event_date.strip(), event_time.strip(), description.strip() or None, title.strip() or None, boys_only == "on")
     request.session["flash"] = {"type": "success", "message": "✅ Event vytvorený!"}
     return RedirectResponse(url=f"/events/{result['id']}", status_code=303)
 
@@ -164,6 +166,7 @@ async def edit_event(
     event_date: str = Form(""),
     event_time: str = Form(""),
     description: str = Form(""),
+    boys_only: str = Form(""),
 ):
     event = database.get_event(event_id)
     if not event:
@@ -180,12 +183,12 @@ async def edit_event(
     if errors:
         return templates.TemplateResponse(request, "event_edit.html", {
             "event": {**event, "title": title, "place": place, "event_date": event_date,
-                      "event_time": event_time, "description": description},
+                      "event_time": event_time, "description": description, "boys_only": boys_only == "on"},
             "errors": errors,
         })
 
     database.update_event(event_id, place.strip(), event_date.strip(),
-                          event_time.strip(), description.strip() or None, title.strip() or None)
+                          event_time.strip(), description.strip() or None, title.strip() or None, boys_only == "on")
     return RedirectResponse(url=f"/events/{event_id}", status_code=303)
 
 

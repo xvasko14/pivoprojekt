@@ -29,6 +29,10 @@ def create_tables():
             conn.execute("ALTER TABLE events ADD COLUMN title TEXT")
         except Exception:
             pass  # column already exists
+        try:
+            conn.execute("ALTER TABLE events ADD COLUMN boys_only INTEGER NOT NULL DEFAULT 0")
+        except Exception:
+            pass  # column already exists
         conn.execute("""
             CREATE TABLE IF NOT EXISTS rsvps (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,15 +45,15 @@ def create_tables():
         """)
 
 
-def create_event(place: str, event_date: str, event_time: str, description: str | None, title: str | None = None) -> dict:
+def create_event(place: str, event_date: str, event_time: str, description: str | None, title: str | None = None, boys_only: bool = False) -> dict:
     event_id = str(uuid.uuid4())
     delete_token = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
     with get_connection() as conn:
         conn.execute(
-            "INSERT INTO events (id, place, event_date, event_time, description, delete_token, created_at, title) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            (event_id, place, event_date, event_time, description, delete_token, now, title),
+            "INSERT INTO events (id, place, event_date, event_time, description, delete_token, created_at, title, boys_only) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (event_id, place, event_date, event_time, description, delete_token, now, title, int(boys_only)),
         )
     return {"id": event_id, "delete_token": delete_token}
 
@@ -118,12 +122,12 @@ def delete_rsvp(rsvp_id: int) -> bool:
     return result.rowcount == 1
 
 
-def update_event(event_id: str, place: str, event_date: str, event_time: str, description: str | None, title: str | None = None) -> bool:
+def update_event(event_id: str, place: str, event_date: str, event_time: str, description: str | None, title: str | None = None, boys_only: bool = False) -> bool:
     """Update event fields. Returns True if found and updated."""
     with get_connection() as conn:
         result = conn.execute(
-            "UPDATE events SET place=?, event_date=?, event_time=?, description=?, title=? WHERE id=?",
-            (place, event_date, event_time, description, title, event_id),
+            "UPDATE events SET place=?, event_date=?, event_time=?, description=?, title=?, boys_only=? WHERE id=?",
+            (place, event_date, event_time, description, title, int(boys_only), event_id),
         )
     return result.rowcount == 1
 

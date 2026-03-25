@@ -13,6 +13,7 @@
   {% if event.description %}
   <div class="event-desc">📝 {{ event.description }}</div>
   {% endif %}
+  <div class="event-badge">{% if event.boys_only %}🍺 Boys only{% else %}🍻 Aj milované polovičky{% endif %}</div>
 </div>
 
 <div class="rsvp-summary">

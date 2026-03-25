@@ -36,6 +36,16 @@
     <input type="text" id="description" name="description" value="{{ event.description or '' }}" placeholder="napr. Oslavujeme Janovu novú robotu 😄">
   </div>
 
+  <div class="form-group">
+    <label style="font-weight:600;display:block;margin-bottom:8px">Kto príde?</label>
+    <label class="radio-option">
+      <input type="radio" name="boys_only" value="" {% if not event.boys_only %}checked{% endif %}> 🍻 Aj milované polovičky
+    </label>
+    <label class="radio-option">
+      <input type="radio" name="boys_only" value="on" {% if event.boys_only %}checked{% endif %}> 🍺 Boys only
+    </label>
+  </div>
+
   <button type="submit" class="btn btn-primary" style="width:100%;padding:12px;font-size:1rem">
     Uložiť zmeny →
   </button>

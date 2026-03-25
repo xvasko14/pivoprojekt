@@ -81,6 +81,7 @@ body {
 }
 .card:hover { border-color: #4f6ef7; }
 .card-place { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+.card-subplace { color: #888; font-size: 0.82rem; margin-bottom: 2px; }
 .card-datetime { color: #666; font-size: 0.88rem; margin-bottom: 8px; }
 .card-going { font-size: 0.85rem; }
 
@@ -105,6 +106,7 @@ body {
 .event-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
 .event-meta { color: #666; font-size: 0.95rem; margin-bottom: 4px; }
 .event-desc { color: #555; font-size: 0.9rem; margin-top: 8px; }
+.event-badge { display: inline-block; margin-top: 10px; font-size: 0.85rem; background: #f0f0f0; border-radius: 20px; padding: 3px 12px; color: #555; }
 
 .rsvp-summary { display: flex; gap: 16px; margin-bottom: 28px; }
 .rsvp-box {
@@ -158,6 +160,9 @@ body {
 .form-row { display: flex; gap: 12px; }
 .form-row .form-group { flex: 1; }
 .form-error { color: #c62828; font-size: 0.85rem; margin-top: 4px; }
+
+.radio-option { display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 0.95rem; font-weight: normal; text-transform: none; letter-spacing: 0; color: #222; cursor: pointer; }
+.radio-option input[type="radio"] { width: auto; }
 
 .back-link { display: inline-block; margin-bottom: 20px; color: #4f6ef7; text-decoration: none; font-size: 0.9rem; }
 .back-link:hover { text-decoration: underline; }
