@@ -5,7 +5,7 @@
 
 <div class="danger-box">
   <h2>Naozaj chceš zmazať tento event?</h2>
-  <p>🍺 <strong>{{ event.place }}</strong> — {{ event.event_date }} o {{ event.event_time }}<br>
+  <p>🍺 <strong>{{ event.place }}</strong> — {{ event.event_date | format_date }} o {{ event.event_time }}<br>
   Táto akcia je nevratná. Zmažú sa aj všetky RSVP odpovede.</p>
   <div class="danger-actions">
     <a href="/events/{{ event.id }}" class="btn btn-secondary">Zrušiť</a>

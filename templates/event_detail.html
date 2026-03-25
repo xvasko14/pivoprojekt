@@ -7,7 +7,7 @@
 
 <div class="event-header">
   <div class="event-title">🍺 {{ event.place }}</div>
-  <div class="event-meta">📅 {{ event.event_date }} o {{ event.event_time }}</div>
+  <div class="event-meta">📅 {{ event.event_date | format_date }} o {{ event.event_time }}</div>
   {% if event.description %}
   <div class="event-desc">📝 {{ event.description }}</div>
   {% endif %}

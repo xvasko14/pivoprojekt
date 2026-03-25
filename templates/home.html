@@ -10,7 +10,7 @@
   <a href="/events/{{ event.id }}" class="card">
     <div class="card-place">🍺 {{ event.place }}</div>
     <div class="card-datetime">
-      📅 {{ event.event_date }} o {{ event.event_time }}
+      📅 {{ event.event_date | format_date }} o {{ event.event_time }}
     </div>
     <div class="card-going">✅ {{ event.going_count }} idú</div>
   </a>
@@ -26,7 +26,7 @@
   {% for event in past %}
   <a href="/events/{{ event.id }}" class="history-item">
     <span>{{ event.place }}</span>
-    <span>{{ event.event_date }} · ✅ {{ event.going_count }} išlo</span>
+    <span>{{ event.event_date | format_date }} · ✅ {{ event.going_count }} išlo</span>
   </a>
   {% endfor %}
 </div>

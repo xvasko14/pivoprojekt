@@ -10,6 +10,21 @@ import os
 import database
 
 
+def format_date(value: str) -> str:
+    """Convert ISO date string to Slovak human-readable format."""
+    from datetime import date as date_type
+    DAYS = ["Pondelok", "Utorok", "Streda", "Štvrtok", "Piatok", "Sobota", "Nedeľa"]
+    MONTHS = [
+        "", "januára", "februára", "marca", "apríla", "mája", "júna",
+        "júla", "augusta", "septembra", "októbra", "novembra", "decembra"
+    ]
+    try:
+        d = date_type.fromisoformat(value)
+        return f"{DAYS[d.weekday()]} {d.day}. {MONTHS[d.month]}"
+    except (ValueError, TypeError):
+        return value
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     database.create_tables()
@@ -20,6 +35,7 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=os.environ.get("SECRET_KEY", "dev-secret-change-in-prod"))
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
+templates.env.filters["format_date"] = format_date
 
 
 @app.get("/", response_class=HTMLResponse)
