@@ -1,6 +1,6 @@
 <!-- templates/event_detail.html -->
 {% extends "base.html" %}
-{% block title %}{{ event.place }} — PivoProjekt{% endblock %}
+{% block title %}{{ event.place }} — DRMF Pivo{% endblock %}
 {% block content %}
 
 <a href="/" class="back-link">← Späť na zoznam</a>
@@ -17,12 +17,30 @@
   <div class="rsvp-box rsvp-box-going">
     <div class="rsvp-count">{{ going | length }}</div>
     <div class="rsvp-label">idú ✅</div>
-    <div class="rsvp-names">{{ going | map(attribute='name') | join(', ') }}</div>
+    <div class="rsvp-names">
+      {% for r in going %}
+      <span class="rsvp-name-row">
+        {{ r.name }}
+        <form method="post" action="/events/{{ event.id }}/rsvp/{{ r.id }}/delete" style="display:inline">
+          <button type="submit" class="rsvp-delete-btn" title="Odstrániť">×</button>
+        </form>
+      </span>
+      {% endfor %}
+    </div>
   </div>
   <div class="rsvp-box rsvp-box-not">
     <div class="rsvp-count">{{ not_going | length }}</div>
     <div class="rsvp-label">nejdú ❌</div>
-    <div class="rsvp-names">{{ not_going | map(attribute='name') | join(', ') }}</div>
+    <div class="rsvp-names">
+      {% for r in not_going %}
+      <span class="rsvp-name-row">
+        {{ r.name }}
+        <form method="post" action="/events/{{ event.id }}/rsvp/{{ r.id }}/delete" style="display:inline">
+          <button type="submit" class="rsvp-delete-btn" title="Odstrániť">×</button>
+        </form>
+      </span>
+      {% endfor %}
+    </div>
   </div>
 </div>
 

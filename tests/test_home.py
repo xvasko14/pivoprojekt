@@ -1,7 +1,7 @@
 def test_home_empty(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert "PivoProjekt" in response.text
+    assert "DRMF Pivo" in response.text
 
 
 def test_home_shows_upcoming_event(client, sample_event):

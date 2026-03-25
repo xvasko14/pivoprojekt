@@ -107,6 +107,13 @@ def upsert_rsvp(event_id: str, name: str, going: bool) -> None:
         )
 
 
+def delete_rsvp(rsvp_id: int) -> bool:
+    """Delete a single RSVP by ID. Returns True if deleted."""
+    with get_connection() as conn:
+        result = conn.execute("DELETE FROM rsvps WHERE id = ?", (rsvp_id,))
+    return result.rowcount == 1
+
+
 def update_event(event_id: str, place: str, event_date: str, event_time: str, description: str | None) -> bool:
     """Update event fields. Returns True if found and updated."""
     with get_connection() as conn:

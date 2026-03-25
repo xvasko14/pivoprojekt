@@ -134,6 +134,14 @@ async def submit_rsvp(
     return RedirectResponse(url=f"/events/{event_id}", status_code=303)
 
 
+@app.post("/events/{event_id}/rsvp/{rsvp_id}/delete")
+async def delete_rsvp(event_id: str, rsvp_id: int, request: Request):
+    if not database.get_event(event_id):
+        raise HTTPException(status_code=404)
+    database.delete_rsvp(rsvp_id)
+    return RedirectResponse(url=f"/events/{event_id}", status_code=303)
+
+
 @app.get("/events/{event_id}/edit", response_class=HTMLResponse)
 async def edit_event_form(event_id: str, request: Request):
     event = database.get_event(event_id)
