@@ -25,6 +25,10 @@ def create_tables():
                 created_at TEXT NOT NULL
             )
         """)
+        try:
+            conn.execute("ALTER TABLE events ADD COLUMN title TEXT")
+        except Exception:
+            pass  # column already exists
         conn.execute("""
             CREATE TABLE IF NOT EXISTS rsvps (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,15 +41,15 @@ def create_tables():
         """)
 
 
-def create_event(place: str, event_date: str, event_time: str, description: str | None) -> dict:
+def create_event(place: str, event_date: str, event_time: str, description: str | None, title: str | None = None) -> dict:
     event_id = str(uuid.uuid4())
     delete_token = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
     with get_connection() as conn:
         conn.execute(
-            "INSERT INTO events (id, place, event_date, event_time, description, delete_token, created_at) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (event_id, place, event_date, event_time, description, delete_token, now),
+            "INSERT INTO events (id, place, event_date, event_time, description, delete_token, created_at, title) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (event_id, place, event_date, event_time, description, delete_token, now, title),
         )
     return {"id": event_id, "delete_token": delete_token}
 
@@ -114,12 +118,12 @@ def delete_rsvp(rsvp_id: int) -> bool:
     return result.rowcount == 1
 
 
-def update_event(event_id: str, place: str, event_date: str, event_time: str, description: str | None) -> bool:
+def update_event(event_id: str, place: str, event_date: str, event_time: str, description: str | None, title: str | None = None) -> bool:
     """Update event fields. Returns True if found and updated."""
     with get_connection() as conn:
         result = conn.execute(
-            "UPDATE events SET place=?, event_date=?, event_time=?, description=? WHERE id=?",
-            (place, event_date, event_time, description, event_id),
+            "UPDATE events SET place=?, event_date=?, event_time=?, description=?, title=? WHERE id=?",
+            (place, event_date, event_time, description, title, event_id),
         )
     return result.rowcount == 1
 

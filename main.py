@@ -59,6 +59,7 @@ async def new_event_form(request: Request):
 @app.post("/events/new")
 async def create_event(
     request: Request,
+    title: str = Form(""),
     place: str = Form(""),
     event_date: str = Form(""),
     event_time: str = Form(""),
@@ -75,13 +76,14 @@ async def create_event(
     if errors:
         return templates.TemplateResponse(request, "event_new.html", {
             "errors": errors,
+            "title": title,
             "place": place,
             "event_date": event_date,
             "event_time": event_time,
             "description": description,
         })
 
-    result = database.create_event(place.strip(), event_date.strip(), event_time.strip(), description.strip() or None)
+    result = database.create_event(place.strip(), event_date.strip(), event_time.strip(), description.strip() or None, title.strip() or None)
     request.session["flash"] = {"type": "success", "message": "✅ Event vytvorený!"}
     return RedirectResponse(url=f"/events/{result['id']}", status_code=303)
 
@@ -157,6 +159,7 @@ async def edit_event_form(event_id: str, request: Request):
 async def edit_event(
     event_id: str,
     request: Request,
+    title: str = Form(""),
     place: str = Form(""),
     event_date: str = Form(""),
     event_time: str = Form(""),
@@ -176,13 +179,13 @@ async def edit_event(
 
     if errors:
         return templates.TemplateResponse(request, "event_edit.html", {
-            "event": {**event, "place": place, "event_date": event_date,
+            "event": {**event, "title": title, "place": place, "event_date": event_date,
                       "event_time": event_time, "description": description},
             "errors": errors,
         })
 
     database.update_event(event_id, place.strip(), event_date.strip(),
-                          event_time.strip(), description.strip() or None)
+                          event_time.strip(), description.strip() or None, title.strip() or None)
     return RedirectResponse(url=f"/events/{event_id}", status_code=303)
 
 

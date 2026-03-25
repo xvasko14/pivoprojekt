@@ -8,6 +8,11 @@
 
 <form method="post" action="/events/new">
   <div class="form-group">
+    <label for="title">Názov eventu (voliteľné)</label>
+    <input type="text" id="title" name="title" value="{{ title or '' }}" placeholder="napr. Najebavka pri príležitosti Romanovej oslavy">
+  </div>
+
+  <div class="form-group">
     <label for="place">Miesto (pub / hostinec)</label>
     <input type="text" id="place" name="place" value="{{ place or '' }}" placeholder="napr. Hostinec U Karla" required>
     {% if errors.place %}<div class="form-error">{{ errors.place }}</div>{% endif %}
