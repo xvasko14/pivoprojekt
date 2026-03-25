@@ -16,7 +16,7 @@ Four focused UX improvements to the existing PivoProjekt app. All changes are in
 
 **Format:** `{day_name} {day}. {month_name}` — e.g., `Piatok 28. marca`
 
-**Applies to:** All templates that display `event_date` — `home.html`, `event_detail.html`, `event_delete_confirm.html`, `event_edit.html`.
+**Applies to:** All templates that display `event_date` — `home.html` (both upcoming cards and history list), `event_detail.html`, `event_delete_confirm.html`, `event_edit.html`.
 
 ---
 
@@ -29,7 +29,7 @@ Four focused UX improvements to the existing PivoProjekt app. All changes are in
 **Changes:**
 - `main.py`: Remove token check from both delete routes. The `token` query parameter is ignored.
 - `database.py`: Add `delete_event_by_id(event_id)` — deletes by ID only, no token check. The `delete_token` column stays in DB (no migration needed).
-- `event_delete_confirm.html`: Remove token from form hidden input.
+- `event_delete_confirm.html`: Remove `?token=...` query parameter from the form `action` URL.
 - `create_event` route: Flash message after creation changes from "save your delete link" warning to a simple "✅ Event vytvorený!" success message.
 
 ---
